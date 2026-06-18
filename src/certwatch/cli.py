@@ -16,7 +16,7 @@ from pathlib import Path
 from certwatch import __version__
 from certwatch.certinfo import CertInfo, decode_cert_file
 from certwatch.probe import ProbeResult, probe_host
-from certwatch.report import exit_code, render_table, to_entries
+from certwatch.report import exit_code, render_json, render_table, to_entries
 
 ProbeFn = Callable[..., ProbeResult]
 
@@ -49,6 +49,7 @@ def _build_watch_parser() -> argparse.ArgumentParser:
     parser.add_argument("--warn", type=int, default=21, help="warn threshold in days")
     parser.add_argument("--critical", type=int, default=7, help="critical threshold in days")
     parser.add_argument("--timeout", type=float, default=10.0, help="connect timeout seconds")
+    parser.add_argument("--json", action="store_true", help="print json instead of a table")
     return parser
 
 
@@ -64,7 +65,10 @@ def run_watch(argv: list[str], probe_fn: ProbeFn | None = None) -> int:
     results = [probe_fn(host, port, timeout=args.timeout) for host, port in targets]
     entries = to_entries(results, warn=args.warn, critical=args.critical)
 
-    render_table(entries)
+    if args.json:
+        print(render_json(entries))
+    else:
+        render_table(entries)
     return exit_code(entries)
 
 
@@ -73,6 +77,7 @@ def run_inspect(argv: list[str]) -> int:
     parser.add_argument("path", help="path to a PEM certificate")
     parser.add_argument("--warn", type=int, default=21)
     parser.add_argument("--critical", type=int, default=7)
+    parser.add_argument("--json", action="store_true", help="print json instead of a table")
     args = parser.parse_args(argv)
 
     try:
@@ -84,7 +89,10 @@ def run_inspect(argv: list[str]) -> int:
         result = ProbeResult(args.path, 0, cert=info)
 
     entries = to_entries([result], warn=args.warn, critical=args.critical)
-    render_table(entries)
+    if args.json:
+        print(render_json(entries))
+    else:
+        render_table(entries)
     return exit_code(entries)
 
 

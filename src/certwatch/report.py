@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 from rich.console import Console
 from rich.table import Table
 
@@ -71,6 +73,10 @@ def _sort_key(entry: dict) -> tuple[int, int]:
 
 def exit_code(entries: list[dict]) -> int:
     return exit_code_for([Status(entry["status"]) for entry in entries])
+
+
+def render_json(entries: list[dict]) -> str:
+    return json.dumps(entries, indent=2, sort_keys=True)
 
 
 def render_table(entries: list[dict], console: Console | None = None) -> None:
