@@ -54,7 +54,7 @@ def probe_host(
             # SNI matters, plenty of hosts serve different certs per name
             with ctx.wrap_socket(sock, server_hostname=host) as tls:
                 der = tls.getpeercert(binary_form=True)
-    except (TimeoutError, socket.timeout):
+    except TimeoutError:
         return ProbeResult(host, port, error="connection timed out")
     except ssl.SSLError as exc:
         return ProbeResult(host, port, error=f"tls handshake failed: {exc}")

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import ssl
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def _name_to_dict(name: tuple | None) -> dict[str, str]:
@@ -27,7 +27,7 @@ def _parse_cert_time(value: str) -> datetime:
     text = " ".join(value.split())
     if text.endswith(" GMT"):
         text = text[:-4]
-    return datetime.strptime(text, "%b %d %H:%M:%S %Y").replace(tzinfo=timezone.utc)
+    return datetime.strptime(text, "%b %d %H:%M:%S %Y").replace(tzinfo=UTC)
 
 
 def decode_cert_file(path: str) -> dict:
@@ -59,7 +59,7 @@ class CertInfo:
         port: int = 443,
         now: datetime | None = None,
     ) -> CertInfo:
-        now = now or datetime.now(timezone.utc)
+        now = now or datetime.now(UTC)
         subject = _name_to_dict(cert.get("subject"))
         issuer = _name_to_dict(cert.get("issuer"))
 

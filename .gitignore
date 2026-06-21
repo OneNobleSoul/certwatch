@@ -11,3 +11,5 @@ venv/
 .coverage
 htmlcov/
 *.pem
+# keep the fixture cert used by the tests
+!tests/data/example-cert.pem
