@@ -9,7 +9,7 @@ description = "TLS certificate expiry monitor for the terminal"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { file = "LICENSE" }
-authors = [{ name = "Unterwegs" }]
+authors = [{ name = "OneNobleSoul" }]
 keywords = ["tls", "ssl", "certificate", "expiry", "monitoring", "cron"]
 classifiers = [
     "Environment :: Console",
@@ -26,8 +26,8 @@ dependencies = ["rich>=13.7"]
 dev = ["pytest>=8.0", "ruff>=0.5"]
 
 [project.urls]
-Homepage = "https://github.com/UnterwegsDev/certwatch"
-Issues = "https://github.com/UnterwegsDev/certwatch/issues"
+Homepage = "https://github.com/OneNobleSoul/certwatch"
+Issues = "https://github.com/OneNobleSoul/certwatch/issues"
 
 [project.scripts]
 certwatch = "certwatch.cli:main"

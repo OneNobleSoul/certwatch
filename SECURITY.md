@@ -5,7 +5,7 @@ handle secrets and doesn't store anything, so the surface is small, but a couple
 of notes.
 
 If you find a security issue, please don't open a public issue. Email me at
-75739931+UnterwegsDev@users.noreply.github.com with details and I'll get back to
+75739931+OneNobleSoul@users.noreply.github.com with details and I'll get back to
 you.
 
 Worth knowing:
