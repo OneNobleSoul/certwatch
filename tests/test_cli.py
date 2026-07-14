@@ -66,6 +66,13 @@ def test_main_no_targets_errors():
         main([], probe_fn=_fake_probe(90))
 
 
+def test_main_missing_targets_file_errors(tmp_path, capsys):
+    missing = tmp_path / "nope.txt"
+    with pytest.raises(SystemExit):
+        main(["--targets", str(missing)], probe_fn=_fake_probe(90))
+    assert "targets file" in capsys.readouterr().err
+
+
 def test_version(capsys):
     assert main(["--version"]) == 0
     assert "certwatch" in capsys.readouterr().out

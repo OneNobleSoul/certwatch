@@ -57,7 +57,11 @@ def run_watch(argv: list[str], probe_fn: ProbeFn | None = None) -> int:
     parser = _build_watch_parser()
     args = parser.parse_args(argv)
 
-    targets = collect_targets(args.hosts, args.targets)
+    try:
+        targets = collect_targets(args.hosts, args.targets)
+    except OSError as exc:
+        parser.error(f"can't read targets file: {exc}")
+
     if not targets:
         parser.error("no targets given (pass hosts or --targets FILE)")
 
