@@ -23,6 +23,15 @@ ProbeFn = Callable[..., ProbeResult]
 
 def parse_target(text: str) -> tuple[str, int]:
     text = text.strip()
+    if text.startswith("["):
+        # bracketed IPv6 literal, optionally with a port: [::1] or [::1]:8443
+        host, _, rest = text[1:].partition("]")
+        if rest.startswith(":"):
+            return host, int(rest[1:])
+        return host, 443
+    if text.count(":") > 1:
+        # bare IPv6 literal, no brackets means no unambiguous place for a port
+        return text, 443
     if ":" in text:
         host, _, port = text.rpartition(":")
         return host, int(port)

@@ -15,6 +15,19 @@ def test_parse_target_explicit_port():
     assert parse_target("example.com:8443") == ("example.com", 8443)
 
 
+def test_parse_target_bare_ipv6():
+    assert parse_target("::1") == ("::1", 443)
+    assert parse_target("2001:db8::1") == ("2001:db8::1", 443)
+
+
+def test_parse_target_bracketed_ipv6():
+    assert parse_target("[::1]") == ("::1", 443)
+
+
+def test_parse_target_bracketed_ipv6_with_port():
+    assert parse_target("[2001:db8::1]:8443") == ("2001:db8::1", 8443)
+
+
 def test_collect_targets_from_file(tmp_path):
     f = tmp_path / "targets.txt"
     f.write_text("a.com\nb.com:8443\n# a comment\n\nc.com  # inline\n")
