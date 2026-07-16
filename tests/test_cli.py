@@ -28,6 +28,16 @@ def test_parse_target_bracketed_ipv6_with_port():
     assert parse_target("[2001:db8::1]:8443") == ("2001:db8::1", 8443)
 
 
+def test_parse_target_bad_port_raises_value_error():
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("example.com:notaport")
+
+
+def test_parse_target_bad_bracketed_port_raises_value_error():
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("[::1]:notaport")
+
+
 def test_collect_targets_from_file(tmp_path):
     f = tmp_path / "targets.txt"
     f.write_text("a.com\nb.com:8443\n# a comment\n\nc.com  # inline\n")
@@ -84,6 +94,12 @@ def test_main_missing_targets_file_errors(tmp_path, capsys):
     with pytest.raises(SystemExit):
         main(["--targets", str(missing)], probe_fn=_fake_probe(90))
     assert "targets file" in capsys.readouterr().err
+
+
+def test_main_malformed_port_errors_cleanly(capsys):
+    with pytest.raises(SystemExit):
+        main(["example.com:notaport"], probe_fn=_fake_probe(90))
+    assert "not a valid port" in capsys.readouterr().err
 
 
 def test_version(capsys):

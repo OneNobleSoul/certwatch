@@ -27,15 +27,22 @@ def parse_target(text: str) -> tuple[str, int]:
         # bracketed IPv6 literal, optionally with a port: [::1] or [::1]:8443
         host, _, rest = text[1:].partition("]")
         if rest.startswith(":"):
-            return host, int(rest[1:])
+            return host, _parse_port(rest[1:], text)
         return host, 443
     if text.count(":") > 1:
         # bare IPv6 literal, no brackets means no unambiguous place for a port
         return text, 443
     if ":" in text:
         host, _, port = text.rpartition(":")
-        return host, int(port)
+        return host, _parse_port(port, text)
     return text, 443
+
+
+def _parse_port(raw: str, target: str) -> int:
+    try:
+        return int(raw)
+    except ValueError:
+        raise ValueError(f"invalid target {target!r}: {raw!r} is not a valid port") from None
 
 
 def collect_targets(hosts: list[str], targets_file: str | None) -> list[tuple[str, int]]:
@@ -70,6 +77,8 @@ def run_watch(argv: list[str], probe_fn: ProbeFn | None = None) -> int:
         targets = collect_targets(args.hosts, args.targets)
     except OSError as exc:
         parser.error(f"can't read targets file: {exc}")
+    except ValueError as exc:
+        parser.error(str(exc))
 
     if not targets:
         parser.error("no targets given (pass hosts or --targets FILE)")
