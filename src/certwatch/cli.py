@@ -25,9 +25,15 @@ def parse_target(text: str) -> tuple[str, int]:
     text = text.strip()
     if text.startswith("["):
         # bracketed IPv6 literal, optionally with a port: [::1] or [::1]:8443
-        host, _, rest = text[1:].partition("]")
+        host, sep, rest = text[1:].partition("]")
+        if not sep:
+            raise ValueError(f"invalid target {text!r}: missing closing ']'")
+        if not host:
+            raise ValueError(f"invalid target {text!r}: empty host in brackets")
         if rest.startswith(":"):
             return host, _parse_port(rest[1:], text)
+        if rest:
+            raise ValueError(f"invalid target {text!r}: unexpected text after ']'")
         return host, 443
     if text.count(":") > 1:
         # bare IPv6 literal, no brackets means no unambiguous place for a port

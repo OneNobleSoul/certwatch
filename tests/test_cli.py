@@ -38,6 +38,23 @@ def test_parse_target_bad_bracketed_port_raises_value_error():
         parse_target("[::1]:notaport")
 
 
+def test_parse_target_missing_closing_bracket_raises_value_error():
+    with pytest.raises(ValueError, match="missing closing"):
+        parse_target("[::1")
+
+
+def test_parse_target_empty_brackets_raise_value_error():
+    with pytest.raises(ValueError, match="empty host"):
+        parse_target("[]")
+
+
+def test_parse_target_trailing_text_after_bracket_raises_value_error():
+    # a missing ':' before the port (e.g. "[::1]8443") must not be silently
+    # swallowed into the default port - that would probe the wrong port.
+    with pytest.raises(ValueError, match="unexpected text"):
+        parse_target("[::1]8443")
+
+
 def test_collect_targets_from_file(tmp_path):
     f = tmp_path / "targets.txt"
     f.write_text("a.com\nb.com:8443\n# a comment\n\nc.com  # inline\n")
