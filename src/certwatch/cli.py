@@ -40,7 +40,11 @@ def parse_target(text: str) -> tuple[str, int]:
         return text, 443
     if ":" in text:
         host, _, port = text.rpartition(":")
+        if not host:
+            raise ValueError(f"invalid target {text!r}: missing host")
         return host, _parse_port(port, text)
+    if not text:
+        raise ValueError("invalid target '': empty target")
     return text, 443
 
 

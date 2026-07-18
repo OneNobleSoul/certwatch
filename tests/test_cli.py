@@ -55,6 +55,18 @@ def test_parse_target_trailing_text_after_bracket_raises_value_error():
         parse_target("[::1]8443")
 
 
+def test_parse_target_missing_host_with_port_raises_value_error():
+    # ":8443" has a syntactically valid port but no host - probing it would
+    # silently hit an empty-string host instead of failing loudly.
+    with pytest.raises(ValueError, match="missing host"):
+        parse_target(":8443")
+
+
+def test_parse_target_empty_string_raises_value_error():
+    with pytest.raises(ValueError, match="empty target"):
+        parse_target("")
+
+
 def test_collect_targets_from_file(tmp_path):
     f = tmp_path / "targets.txt"
     f.write_text("a.com\nb.com:8443\n# a comment\n\nc.com  # inline\n")
@@ -117,6 +129,12 @@ def test_main_malformed_port_errors_cleanly(capsys):
     with pytest.raises(SystemExit):
         main(["example.com:notaport"], probe_fn=_fake_probe(90))
     assert "not a valid port" in capsys.readouterr().err
+
+
+def test_main_missing_host_errors_cleanly(capsys):
+    with pytest.raises(SystemExit):
+        main([":8443"], probe_fn=_fake_probe(90))
+    assert "missing host" in capsys.readouterr().err
 
 
 def test_version(capsys):
