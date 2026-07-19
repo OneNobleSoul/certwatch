@@ -38,6 +38,29 @@ def test_parse_target_bad_bracketed_port_raises_value_error():
         parse_target("[::1]:notaport")
 
 
+def test_parse_target_port_out_of_range_raises_value_error():
+    # a syntactically fine integer that isn't a real TCP port (>65535 or <=0)
+    # used to sail through and crash socket.create_connection with a raw
+    # OverflowError instead of a clean argparse error.
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("example.com:99999")
+
+
+def test_parse_target_port_zero_raises_value_error():
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("example.com:0")
+
+
+def test_parse_target_negative_port_raises_value_error():
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("example.com:-1")
+
+
+def test_parse_target_bracketed_port_out_of_range_raises_value_error():
+    with pytest.raises(ValueError, match="not a valid port"):
+        parse_target("[::1]:70000")
+
+
 def test_parse_target_missing_closing_bracket_raises_value_error():
     with pytest.raises(ValueError, match="missing closing"):
         parse_target("[::1")

@@ -50,9 +50,12 @@ def parse_target(text: str) -> tuple[str, int]:
 
 def _parse_port(raw: str, target: str) -> int:
     try:
-        return int(raw)
+        port = int(raw)
     except ValueError:
         raise ValueError(f"invalid target {target!r}: {raw!r} is not a valid port") from None
+    if not 1 <= port <= 65535:
+        raise ValueError(f"invalid target {target!r}: {raw!r} is not a valid port")
+    return port
 
 
 def collect_targets(hosts: list[str], targets_file: str | None) -> list[tuple[str, int]]:
